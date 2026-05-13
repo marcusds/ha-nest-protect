@@ -266,6 +266,7 @@ async def _async_subscribe_for_data(
 
     except asyncio.exceptions.TimeoutError:
         LOGGER.debug("Subscriber: session timed out.")
+        sm.record_success()
         _register_subscribe_task(hass, entry, data)
 
     except ClientConnectorError:
@@ -300,6 +301,7 @@ async def _async_subscribe_for_data(
         await asyncio.sleep(sm.backoff_interval)
 
         await sm.async_refresh_session()
+        sm.record_success()
         _register_subscribe_task(hass, entry, data)
 
     except BadCredentialsException:

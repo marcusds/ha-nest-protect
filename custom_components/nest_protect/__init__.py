@@ -266,6 +266,7 @@ async def _async_subscribe_for_data(
 
     except asyncio.exceptions.TimeoutError:
         LOGGER.debug("Subscriber: session timed out.")
+        sm.record_success()
         _register_subscribe_task(hass, entry, data)
 
     except ClientConnectorError:
@@ -300,6 +301,16 @@ async def _async_subscribe_for_data(
         await asyncio.sleep(sm.backoff_interval)
 
         await sm.async_refresh_session()
+
+        if sm.refreshed_cookies and sm.refreshed_cookies != entry.data.get(
+            CONF_COOKIES
+        ):
+            LOGGER.debug("Persisting refreshed Nest cookies after token refresh")
+            hass.config_entries.async_update_entry(
+                entry,
+                data={**entry.data, CONF_COOKIES: sm.refreshed_cookies},
+            )
+
         _register_subscribe_task(hass, entry, data)
 
     except BadCredentialsException:

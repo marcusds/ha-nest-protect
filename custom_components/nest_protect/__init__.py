@@ -311,7 +311,6 @@ async def _async_subscribe_for_data(
                 data={**entry.data, CONF_COOKIES: sm.refreshed_cookies},
             )
 
-        sm.record_success()
         _register_subscribe_task(hass, entry, data)
 
     except BadCredentialsException:
